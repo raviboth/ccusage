@@ -135,9 +135,11 @@ class DashboardWindow(QWidget):
         self._layout.addWidget(alerts_header)
 
         threshold_row = QHBoxLayout()
+        threshold_row.setContentsMargins(0, 0, 0, 0)
         self._threshold_check = QCheckBox("5h usage alert at:")
         self._threshold_check.setStyleSheet("font-size: 12px;")
         threshold_row.addWidget(self._threshold_check)
+        threshold_row.addSpacing(4)
 
         self._threshold_spin = QSpinBox()
         self._threshold_spin.setRange(10, 100)
@@ -152,9 +154,13 @@ class DashboardWindow(QWidget):
         threshold_row.addStretch()
         self._layout.addLayout(threshold_row)
 
+        reset_row = QHBoxLayout()
+        reset_row.setContentsMargins(0, 4, 0, 8)
         self._reset_check = QCheckBox("Notify when usage window resets")
-        self._reset_check.setStyleSheet("font-size: 12px; margin-top: 4px; margin-bottom: 8px;")
-        self._layout.addWidget(self._reset_check)
+        self._reset_check.setStyleSheet("font-size: 12px;")
+        reset_row.addWidget(self._reset_check)
+        reset_row.addStretch()
+        self._layout.addLayout(reset_row)
 
         # Placeholder for charts (added later)
         self._chart_placeholder = QWidget()
