@@ -74,6 +74,12 @@ chmod +x dist/Claude_Usage_Monitor-x86_64.AppImage
 
 Pre-built macOS `.app` and Linux `.AppImage` binaries are available on the [Releases](https://github.com/raviboth/claude-code-usage-monitor/releases) page.
 
+**macOS note:** Downloaded `.app` bundles are quarantined by Gatekeeper since they aren't signed with an Apple Developer certificate. Remove the quarantine flag before first launch:
+
+```bash
+xattr -cr "Claude Usage Monitor.app"
+```
+
 ## Usage
 
 ### Manual Start
