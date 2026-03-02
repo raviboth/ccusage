@@ -1,5 +1,7 @@
 # Claude Code Usage Monitor
 
+> Built with [Claude Code](https://claude.ai/claude-code)
+
 A lightweight desktop utility for macOS and Linux that displays your Claude Code usage limits in the system tray and a dashboard window.
 
 ## Features
