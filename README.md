@@ -43,6 +43,17 @@ pip install -r requirements.txt
 
 To uninstall, run the corresponding `uninstall-macos.sh` or `uninstall-linux.sh`.
 
+### Standalone .app (macOS)
+
+Build a double-clickable app bundle that doesn't require Python:
+
+```bash
+pip install pyinstaller
+./scripts/build-macos.sh
+```
+
+The built app will be at `dist/Claude Usage Monitor.app`. Copy it to `/Applications/` to install.
+
 ## Usage
 
 ### Manual Start
@@ -118,6 +129,7 @@ src/
 
 scripts/
 ├── claude-monitor       # CLI wrapper (start/stop/status)
+├── build-macos.sh       # Build standalone .app bundle
 ├── install-macos.sh     # macOS launch agent installer
 ├── uninstall-macos.sh   # macOS launch agent uninstaller
 ├── install-linux.sh     # Linux systemd service installer
