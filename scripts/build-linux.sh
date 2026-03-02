@@ -34,8 +34,9 @@ cp -r "dist/Claude Usage Monitor/"* "$APPDIR/usr/bin/"
 
 # Generate a 256x256 icon from the app's icon module
 python3 -c "
-from src.icons import create_icon
-img = create_icon(50, 256)
+from src.icons import render_tray_icon
+img = render_tray_icon(None)
+img = img.resize((256, 256))
 img.save('$APPDIR/usr/share/icons/hicolor/256x256/apps/claude-usage-monitor.png')
 "
 

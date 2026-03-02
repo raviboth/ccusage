@@ -71,8 +71,9 @@ jobs:
       - name: Generate icon
         run: |
           python3 -c "
-          from src.icons import create_icon
-          img = create_icon(50, 256)
+          from src.icons import render_tray_icon
+          img = render_tray_icon(None)
+          img = img.resize((256, 256))
           img.save('claude-usage-monitor.png')
           "
 
