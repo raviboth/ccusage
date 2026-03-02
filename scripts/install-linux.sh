@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 VENV_PYTHON="$PROJECT_DIR/.venv/bin/python"
-SERVICE_NAME="claude-usage-monitor.service"
+SERVICE_NAME="ccusage.service"
 SERVICE_DIR="$HOME/.config/systemd/user"
 SERVICE_PATH="$SERVICE_DIR/$SERVICE_NAME"
 SYMLINK_DIR="$HOME/.local/bin"
@@ -78,6 +78,6 @@ if [[ ":$PATH:" != *":$SYMLINK_DIR:"* ]]; then
 fi
 
 echo ""
-echo "Installation complete. Claude Usage Monitor will start automatically at login."
+echo "Installation complete. Claude Code Usage Monitor will start automatically at login."
 echo "Manual control:  claude-monitor start | stop | status"
 echo "Service logs:    journalctl --user -u $SERVICE_NAME -f"

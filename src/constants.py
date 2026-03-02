@@ -34,6 +34,6 @@ STATS_CACHE_PATH = Path.home() / ".claude" / "stats-cache.json"
 
 # App data directory
 if sys.platform == "darwin":
-    APP_DATA_DIR = Path.home() / "Library" / "Application Support" / "claude-usage-monitor"
+    APP_DATA_DIR = Path.home() / "Library" / "Application Support" / "ccusage"
 else:
-    APP_DATA_DIR = Path.home() / ".local" / "share" / "claude-usage-monitor"
+    APP_DATA_DIR = Path.home() / ".local" / "share" / "ccusage"

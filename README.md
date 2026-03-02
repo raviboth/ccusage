@@ -22,8 +22,8 @@ A lightweight desktop utility for macOS and Linux that displays your Claude Code
 ## Installation
 
 ```bash
-git clone https://github.com/raviboth/claude-code-usage-monitor.git
-cd claude-code-usage-monitor
+git clone https://github.com/raviboth/ccusage.git
+cd ccusage
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -52,7 +52,7 @@ pip install pyinstaller
 ./scripts/build-macos.sh
 ```
 
-The built app will be at `dist/Claude Usage Monitor.app`. Copy it to `/Applications/` to install.
+The built app will be at `dist/Claude Code Usage Monitor.app`. Copy it to `/Applications/` to install.
 
 ### Standalone AppImage (Linux)
 
@@ -63,21 +63,21 @@ pip install pyinstaller
 ./scripts/build-linux.sh
 ```
 
-The built AppImage will be at `dist/Claude_Usage_Monitor-x86_64.AppImage`. Make it executable and run:
+The built AppImage will be at `dist/ccusage-x86_64.AppImage`. Make it executable and run:
 
 ```bash
-chmod +x dist/Claude_Usage_Monitor-x86_64.AppImage
-./dist/Claude_Usage_Monitor-x86_64.AppImage
+chmod +x dist/ccusage-x86_64.AppImage
+./dist/ccusage-x86_64.AppImage
 ```
 
 ### Pre-built Binaries
 
-Pre-built macOS `.app` and Linux `.AppImage` binaries are available on the [Releases](https://github.com/raviboth/claude-code-usage-monitor/releases) page.
+Pre-built macOS `.app` and Linux `.AppImage` binaries are available on the [Releases](https://github.com/raviboth/ccusage/releases) page.
 
 **macOS note:** Downloaded `.app` bundles are quarantined by Gatekeeper since they aren't signed with an Apple Developer certificate. Remove the quarantine flag before first launch:
 
 ```bash
-xattr -cr "Claude Usage Monitor.app"
+xattr -cr "Claude Code Usage Monitor.app"
 ```
 
 ## Usage
@@ -134,8 +134,8 @@ Local usage history from `~/.claude/stats-cache.json` is used for the activity c
 - **HTTPS only** — all API communication uses TLS
 
 Data is stored locally in:
-- macOS: `~/Library/Application Support/claude-usage-monitor/`
-- Linux: `~/.local/share/claude-usage-monitor/`
+- macOS: `~/Library/Application Support/ccusage/`
+- Linux: `~/.local/share/ccusage/`
 
 ## Project Structure
 

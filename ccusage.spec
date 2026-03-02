@@ -25,7 +25,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='Claude Usage Monitor',
+    name='Claude Code Usage Monitor',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -41,15 +41,15 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Claude Usage Monitor',
+    name='Claude Code Usage Monitor',
 )
 
 if sys.platform == 'darwin':
     app = BUNDLE(
         coll,
-        name='Claude Usage Monitor.app',
+        name='Claude Code Usage Monitor.app',
         icon=None,
-        bundle_identifier='com.claude-usage-monitor',
+        bundle_identifier='com.ccusage',
         info_plist={
             'LSUIElement': True,
             'CFBundleShortVersionString': '0.1.0',

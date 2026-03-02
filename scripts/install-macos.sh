@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 VENV_PYTHON="$PROJECT_DIR/.venv/bin/python"
-PLIST_NAME="com.claude-usage-monitor.plist"
+PLIST_NAME="com.ccusage.plist"
 PLIST_PATH="$HOME/Library/LaunchAgents/$PLIST_NAME"
 SYMLINK_DIR="$HOME/.local/bin"
 SYMLINK_PATH="$SYMLINK_DIR/claude-monitor"
@@ -37,7 +37,7 @@ cat > "$PLIST_PATH" <<PLIST
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.claude-usage-monitor</string>
+    <string>com.ccusage</string>
 
     <key>ProgramArguments</key>
     <array>
@@ -88,5 +88,5 @@ if [[ ":$PATH:" != *":$SYMLINK_DIR:"* ]]; then
 fi
 
 echo ""
-echo "Installation complete. Claude Usage Monitor will start automatically at login."
+echo "Installation complete. Claude Code Usage Monitor will start automatically at login."
 echo "Manual control:  claude-monitor start | stop | status"

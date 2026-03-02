@@ -50,11 +50,11 @@ cmd_start() {
     local existing_pid
     existing_pid=$(_find_pid)
     if [[ -n "$existing_pid" ]]; then
-        echo "Claude Usage Monitor is already running (PID $existing_pid)."
+        echo "Claude Code Usage Monitor is already running (PID $existing_pid)."
         exit 0
     fi
 
-    echo "Starting Claude Usage Monitor..."
+    echo "Starting Claude Code Usage Monitor..."
     cd "$PROJECT_DIR"
     nohup "$VENV_PYTHON" -m src.main >> "$LOG_FILE" 2>&1 &
     local pid=$!
@@ -66,11 +66,11 @@ cmd_stop() {
     local pid
     pid=$(_find_pid)
     if [[ -z "$pid" ]]; then
-        echo "Claude Usage Monitor is not running."
+        echo "Claude Code Usage Monitor is not running."
         exit 0
     fi
 
-    echo "Stopping Claude Usage Monitor (PID $pid)..."
+    echo "Stopping Claude Code Usage Monitor (PID $pid)..."
     kill "$pid" 2>/dev/null || true
     rm -f "$PID_FILE"
     echo "Stopped."
@@ -80,9 +80,9 @@ cmd_status() {
     local pid
     pid=$(_find_pid)
     if [[ -n "$pid" ]]; then
-        echo "Claude Usage Monitor is running (PID $pid)."
+        echo "Claude Code Usage Monitor is running (PID $pid)."
     else
-        echo "Claude Usage Monitor is not running."
+        echo "Claude Code Usage Monitor is not running."
     fi
 }
 

@@ -17,12 +17,12 @@ else
     exit 1
 fi
 
-echo "Building Claude Usage Monitor.app..."
-pyinstaller claude-usage-monitor.spec --noconfirm --clean
+echo "Building Claude Code Usage Monitor.app..."
+pyinstaller ccusage.spec --noconfirm --clean
 
 echo ""
 echo "Build complete!"
-echo "App bundle: $PROJECT_DIR/dist/Claude Usage Monitor.app"
+echo "App bundle: $PROJECT_DIR/dist/Claude Code Usage Monitor.app"
 echo ""
 echo "To install, copy to /Applications:"
-echo "  cp -r \"dist/Claude Usage Monitor.app\" /Applications/"
+echo "  cp -r \"dist/Claude Code Usage Monitor.app\" /Applications/"

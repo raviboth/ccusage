@@ -5,7 +5,7 @@
 #
 set -euo pipefail
 
-PLIST_NAME="com.claude-usage-monitor.plist"
+PLIST_NAME="com.ccusage.plist"
 PLIST_PATH="$HOME/Library/LaunchAgents/$PLIST_NAME"
 SYMLINK_PATH="$HOME/.local/bin/claude-monitor"
 

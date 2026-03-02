@@ -5,7 +5,7 @@
 #
 set -euo pipefail
 
-SERVICE_NAME="claude-usage-monitor.service"
+SERVICE_NAME="ccusage.service"
 SERVICE_PATH="$HOME/.config/systemd/user/$SERVICE_NAME"
 SYMLINK_PATH="$HOME/.local/bin/claude-monitor"
 
