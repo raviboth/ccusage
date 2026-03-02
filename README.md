@@ -4,16 +4,14 @@ A lightweight desktop utility for macOS and Linux that displays your Claude Code
 
 ## Features
 
-- **System tray icon** showing your current 5-hour usage percentage, color-coded (green/yellow/red)
+- **System tray icon** showing your current 5-hour usage percentage as a color-coded ring (green/yellow/red)
 - **Right-click menu** with all usage stats and reset times at a glance
 - **Dashboard window** with progress bars, reset countdowns, daily activity charts, and usage insights
+- **Configurable alerts** — set a custom 5h usage threshold (default 70%) to get notified before hitting limits
+- **Reset notifications** — opt-in alerts when your usage window resets
 - **Extra usage tracking** for overage credits (if enabled on your plan)
 - Polls the Anthropic usage API every 60 seconds with manual refresh option
 - Stores usage history locally in SQLite for trend tracking
-
-## Screenshots
-
-*Coming soon*
 
 ## Requirements
 
@@ -31,16 +29,42 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Auto-Start on Login
+
+**macOS:**
+```bash
+./scripts/install-macos.sh
+```
+
+**Linux:**
+```bash
+./scripts/install-linux.sh
+```
+
+To uninstall, run the corresponding `uninstall-macos.sh` or `uninstall-linux.sh`.
+
 ## Usage
+
+### Manual Start
 
 ```bash
 source .venv/bin/activate
 python -m src.main
 ```
 
+### Using the CLI Wrapper
+
+```bash
+./scripts/claude-monitor start    # Start in background
+./scripts/claude-monitor stop     # Stop
+./scripts/claude-monitor status   # Check if running
+```
+
 The app will appear in your system tray. Right-click the icon to see usage stats or open the dashboard.
 
 ### Tray Icon
+
+The tray icon displays the current 5h usage percentage inside a color-coded ring:
 
 | Color | Meaning |
 |-------|---------|
@@ -54,6 +78,7 @@ The dashboard shows:
 - **5-Hour Limit** — rolling usage with reset countdown
 - **7-Day Limit** — weekly usage with reset countdown
 - **Extra Usage** — overage credits used vs. monthly cap (if enabled)
+- **Alerts** — configurable threshold for 5h usage notifications (spinbox, 10-100%) and toggle for reset notifications
 - **Daily Activity** — bar chart of messages, sessions, or tool calls over the last 30 days
 - **Insights** — peak hours, most active day, models used, total sessions
 
@@ -79,16 +104,24 @@ Data is stored locally in:
 
 ```
 src/
-├── main.py          # Entry point, wires everything together
-├── auth.py          # Token retrieval from system keychain
-├── api.py           # Usage API polling
-├── db.py            # SQLite storage for usage history
-├── local_stats.py   # Reads ~/.claude/stats-cache.json
-├── tray.py          # System tray icon and menu (QSystemTrayIcon)
-├── dashboard.py     # Main PyQt6 window with progress bars
-├── charts.py        # Daily activity chart and insights panel
-├── icons.py         # Dynamic tray icon rendering with Pillow
-└── constants.py     # Configuration values
+├── main.py            # Entry point, wires everything together
+├── auth.py            # Token retrieval from system keychain
+├── api.py             # Usage API polling
+├── db.py              # SQLite storage for usage history
+├── local_stats.py     # Reads ~/.claude/stats-cache.json
+├── notifications.py   # Threshold and reset alert notifications
+├── tray.py            # System tray icon and menu (QSystemTrayIcon)
+├── dashboard.py       # Main PyQt6 window with progress bars
+├── charts.py          # Daily activity chart and insights panel
+├── icons.py           # Dynamic tray icon rendering with Pillow
+└── constants.py       # Configuration values
+
+scripts/
+├── claude-monitor       # CLI wrapper (start/stop/status)
+├── install-macos.sh     # macOS launch agent installer
+├── uninstall-macos.sh   # macOS launch agent uninstaller
+├── install-linux.sh     # Linux systemd service installer
+└── uninstall-linux.sh   # Linux systemd service uninstaller
 ```
 
 ## Known Limitations
