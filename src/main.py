@@ -91,11 +91,11 @@ class App:
         self._status_timer.timeout.connect(self._refresh_status_time)
         self._status_timer.start(10_000)
 
-    def _poll_once(self) -> None:
+    def _poll_once(self) -> UsageResult | None:
         auth = get_oauth_token()
         if auth.error or not auth.access_token:
             self._signals.usage_error.emit(auth.error or "No token available.")
-            return
+            return None
 
         token = auth.access_token
         del auth
@@ -103,20 +103,26 @@ class App:
         del token
         if result.error or not result.data:
             self._signals.usage_error.emit(result.error or "Unknown error.")
-            return
+            return result
 
         self._db.insert_snapshot(result.data)
         self._signals.usage_updated.emit(result.data)
+        return result
 
     def _poll_loop(self) -> None:
         consecutive_errors = 0
         while self._running:
-            self._poll_once()
-            if self._last_data is not None:
+            result = self._poll_once()
+            if result and result.data:
                 consecutive_errors = 0
+                wait = POLL_INTERVAL_SECONDS
             else:
-                consecutive_errors = min(consecutive_errors + 1, 3)
-            wait = min(POLL_INTERVAL_SECONDS * (2 ** consecutive_errors), 300)
+                consecutive_errors = min(consecutive_errors + 1, 5)
+                # Respect Retry-After header from 429 responses
+                if result and result.retry_after:
+                    wait = max(result.retry_after, POLL_INTERVAL_SECONDS)
+                else:
+                    wait = min(POLL_INTERVAL_SECONDS * (2 ** consecutive_errors), 600)
             for _ in range(int(wait * 10)):
                 if not self._running:
                     return

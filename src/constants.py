@@ -4,7 +4,7 @@ from pathlib import Path
 # API
 USAGE_API_URL = "https://api.anthropic.com/api/oauth/usage"
 USAGE_API_BETA_HEADER = "oauth-2025-04-20"
-POLL_INTERVAL_SECONDS = 60
+POLL_INTERVAL_SECONDS = 300
 API_TIMEOUT_SECONDS = 5
 
 # Keychain

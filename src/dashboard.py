@@ -251,6 +251,7 @@ class DashboardWindow(QWidget):
 
     def update_error(self, error: str) -> None:
         self._status_label.setText(f"Error: {error}")
+        self._status_label.setWordWrap(True)
 
     def get_chart_placeholder(self) -> QWidget:
         return self._chart_placeholder

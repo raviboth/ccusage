@@ -33,6 +33,7 @@ class UsageData:
 class UsageResult:
     data: UsageData | None
     error: str | None
+    retry_after: int | None = None
 
 
 def fetch_usage(access_token: str) -> UsageResult:
@@ -58,6 +59,19 @@ def fetch_usage(access_token: str) -> UsageResult:
         return UsageResult(data=None, error="Could not connect to Anthropic API.")
     except requests.HTTPError as e:
         status = e.response.status_code if e.response is not None else "unknown"
+        if status == 429:
+            retry_after = None
+            if e.response is not None:
+                raw = e.response.headers.get("Retry-After")
+                if raw and raw.isdigit():
+                    retry_after = max(int(raw), 120)  # floor at 2 min
+                else:
+                    retry_after = 120
+            return UsageResult(
+                data=None,
+                error="Rate limited (429).\nToo many sessions may be sharing the quota.",
+                retry_after=retry_after,
+            )
         return UsageResult(data=None, error=f"API returned HTTP {status}.")
     except requests.RequestException:
         return UsageResult(data=None, error="API request failed.")
