@@ -16,6 +16,22 @@ from src.notifications import NotificationManager
 from src.tray import TrayManager
 
 
+def compute_backoff(
+    result: UsageResult | None,
+    consecutive_errors: int,
+    poll_interval: int,
+) -> tuple[int, int]:
+    """Compute (new_consecutive_errors, wait_seconds) based on poll result."""
+    if result and result.data:
+        return 0, poll_interval
+    consecutive_errors = min(consecutive_errors + 1, 5)
+    if result and result.retry_after:
+        wait = max(result.retry_after, poll_interval)
+    else:
+        wait = min(poll_interval * (2 ** consecutive_errors), 600)
+    return consecutive_errors, wait
+
+
 class Signals(QObject):
     """Bridge between the polling thread and the Qt main thread."""
 
@@ -113,16 +129,9 @@ class App:
         consecutive_errors = 0
         while self._running:
             result = self._poll_once()
-            if result and result.data:
-                consecutive_errors = 0
-                wait = POLL_INTERVAL_SECONDS
-            else:
-                consecutive_errors = min(consecutive_errors + 1, 5)
-                # Respect Retry-After header from 429 responses
-                if result and result.retry_after:
-                    wait = max(result.retry_after, POLL_INTERVAL_SECONDS)
-                else:
-                    wait = min(POLL_INTERVAL_SECONDS * (2 ** consecutive_errors), 600)
+            consecutive_errors, wait = compute_backoff(
+                result, consecutive_errors, POLL_INTERVAL_SECONDS
+            )
             for _ in range(int(wait * 10)):
                 if not self._running:
                     return

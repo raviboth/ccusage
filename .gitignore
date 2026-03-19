@@ -28,6 +28,7 @@ venv/
 # Claude Code local config
 .claude/
 docs/plans/
+plan/
 
 # OS
 .DS_Store
