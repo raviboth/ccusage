@@ -10,9 +10,6 @@ API_TIMEOUT_SECONDS = 5
 # Keychain
 KEYCHAIN_SERVICE_NAME = "Claude Code-credentials"
 
-# OAuth token refresh
-OAUTH_TOKEN_URL = "https://platform.claude.com/v1/oauth/token"
-OAUTH_CLIENT_ID = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"
 
 # Colors (hex)
 COLOR_GREEN = "#4CAF50"

@@ -156,11 +156,40 @@ class DashboardWindow(QWidget):
 
         reset_row = QHBoxLayout()
         reset_row.setContentsMargins(0, 4, 0, 8)
-        self._reset_check = QCheckBox("Notify when usage window resets")
+        self._reset_check = QCheckBox("Notify when 5h window resets")
         self._reset_check.setStyleSheet("font-size: 12px;")
         reset_row.addWidget(self._reset_check)
         reset_row.addStretch()
         self._layout.addLayout(reset_row)
+
+        # 7-day alert controls
+        seven_day_threshold_row = QHBoxLayout()
+        seven_day_threshold_row.setContentsMargins(0, 0, 0, 0)
+        self._seven_day_threshold_check = QCheckBox("7d usage alert at:")
+        self._seven_day_threshold_check.setStyleSheet("font-size: 12px;")
+        seven_day_threshold_row.addWidget(self._seven_day_threshold_check)
+        seven_day_threshold_row.addSpacing(4)
+
+        self._seven_day_threshold_spin = QSpinBox()
+        self._seven_day_threshold_spin.setRange(10, 100)
+        self._seven_day_threshold_spin.setValue(70)
+        self._seven_day_threshold_spin.setFixedWidth(60)
+        seven_day_threshold_row.addWidget(self._seven_day_threshold_spin)
+
+        seven_day_pct_label = QLabel("%")
+        seven_day_pct_label.setStyleSheet("font-size: 12px;")
+        seven_day_threshold_row.addWidget(seven_day_pct_label)
+
+        seven_day_threshold_row.addStretch()
+        self._layout.addLayout(seven_day_threshold_row)
+
+        seven_day_reset_row = QHBoxLayout()
+        seven_day_reset_row.setContentsMargins(0, 4, 0, 8)
+        self._seven_day_reset_check = QCheckBox("Notify when 7d window resets")
+        self._seven_day_reset_check.setStyleSheet("font-size: 12px;")
+        seven_day_reset_row.addWidget(self._seven_day_reset_check)
+        seven_day_reset_row.addStretch()
+        self._layout.addLayout(seven_day_reset_row)
 
         # Placeholder for charts (added later)
         self._chart_placeholder = QWidget()
@@ -200,8 +229,27 @@ class DashboardWindow(QWidget):
     def set_threshold_spin_enabled(self, enabled: bool) -> None:
         self._threshold_spin.setEnabled(enabled)
 
+    # 7d callback setters
+    def set_seven_day_threshold_callback(self, callback: Callable[[], None]) -> None:
+        self._seven_day_threshold_spin.valueChanged.connect(callback)
+
+    def set_seven_day_threshold_enabled_callback(self, callback: Callable[[], None]) -> None:
+        self._seven_day_threshold_check.stateChanged.connect(callback)
+
+    def set_seven_day_reset_alerts_callback(self, callback: Callable[[], None]) -> None:
+        self._seven_day_reset_check.stateChanged.connect(callback)
+
+    def set_seven_day_threshold_spin_enabled(self, enabled: bool) -> None:
+        self._seven_day_threshold_spin.setEnabled(enabled)
+
     def update_alert_settings(
-        self, threshold: float, threshold_enabled: bool, reset_enabled: bool
+        self,
+        threshold: float,
+        threshold_enabled: bool,
+        reset_enabled: bool,
+        seven_day_threshold: float = 0.70,
+        seven_day_threshold_enabled: bool = True,
+        seven_day_reset_enabled: bool = False,
     ) -> None:
         self._threshold_spin.blockSignals(True)
         self._threshold_spin.setValue(int(threshold * 100))
@@ -215,6 +263,19 @@ class DashboardWindow(QWidget):
         self._reset_check.blockSignals(True)
         self._reset_check.setChecked(reset_enabled)
         self._reset_check.blockSignals(False)
+
+        self._seven_day_threshold_spin.blockSignals(True)
+        self._seven_day_threshold_spin.setValue(int(seven_day_threshold * 100))
+        self._seven_day_threshold_spin.blockSignals(False)
+
+        self._seven_day_threshold_check.blockSignals(True)
+        self._seven_day_threshold_check.setChecked(seven_day_threshold_enabled)
+        self._seven_day_threshold_spin.setEnabled(seven_day_threshold_enabled)
+        self._seven_day_threshold_check.blockSignals(False)
+
+        self._seven_day_reset_check.blockSignals(True)
+        self._seven_day_reset_check.setChecked(seven_day_reset_enabled)
+        self._seven_day_reset_check.blockSignals(False)
 
     def update_usage(self, data: UsageData) -> None:
         self._five_hour_bar.update_data(data.five_hour)

@@ -65,10 +65,16 @@ class App:
         self._dashboard.set_threshold_callback(self._on_threshold_changed)
         self._dashboard.set_threshold_enabled_callback(self._on_threshold_enabled_changed)
         self._dashboard.set_reset_alerts_callback(self._on_reset_alerts_changed)
+        self._dashboard.set_seven_day_threshold_callback(self._on_seven_day_threshold_changed)
+        self._dashboard.set_seven_day_threshold_enabled_callback(self._on_seven_day_threshold_enabled_changed)
+        self._dashboard.set_seven_day_reset_alerts_callback(self._on_seven_day_reset_alerts_changed)
         self._dashboard.update_alert_settings(
             self._notifications.threshold,
             self._notifications.threshold_enabled,
             self._notifications.reset_notifications,
+            self._notifications.seven_day_threshold,
+            self._notifications.seven_day_threshold_enabled,
+            self._notifications.seven_day_reset_notifications,
         )
 
         # Charts + insights
@@ -191,6 +197,17 @@ class App:
 
     def _on_reset_alerts_changed(self, state: int) -> None:
         self._notifications.set_reset_notifications(state != 0)
+
+    def _on_seven_day_threshold_changed(self, value: int) -> None:
+        self._notifications.update_seven_day_threshold(value / 100.0)
+
+    def _on_seven_day_threshold_enabled_changed(self, state: int) -> None:
+        enabled = state != 0
+        self._notifications.set_seven_day_threshold_enabled(enabled)
+        self._dashboard.set_seven_day_threshold_spin_enabled(enabled)
+
+    def _on_seven_day_reset_alerts_changed(self, state: int) -> None:
+        self._notifications.set_seven_day_reset_notifications(state != 0)
 
     def run(self) -> None:
         # Show tray icon

@@ -2,17 +2,13 @@
 
 import json
 import subprocess
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from src.auth import (
-    _get_keychain_account,
     _read_credentials_linux,
     _read_keychain_macos,
-    _save_credentials_linux,
-    _save_keychain_macos,
 )
 
 
@@ -88,68 +84,3 @@ class TestReadCredentialsLinux:
         with patch("src.auth.Path.home", return_value=tmp_path):
             result = _read_credentials_linux()
         assert result is None
-
-
-# ── macOS keychain saving ────────────────────────────────────────────────────
-
-
-class TestSaveKeychainMacOS:
-    @patch("src.auth._get_keychain_account", return_value="testuser")
-    @patch("src.auth.subprocess.run")
-    def test_delete_and_add(self, mock_run, mock_acct):
-        _save_keychain_macos('{"test": true}')
-        assert mock_run.call_count == 2
-        # First call: delete
-        assert "delete-generic-password" in mock_run.call_args_list[0][0][0]
-        # Second call: add
-        add_args = mock_run.call_args_list[1][0][0]
-        assert "add-generic-password" in add_args
-        assert "testuser" in add_args
-        assert '{"test": true}' in add_args
-
-    @patch("src.auth._get_keychain_account", return_value="testuser")
-    @patch("src.auth.subprocess.run")
-    def test_timeout_silent(self, mock_run, mock_acct):
-        mock_run.side_effect = subprocess.TimeoutExpired(cmd="security", timeout=5)
-        # Should not raise
-        _save_keychain_macos('{"test": true}')
-
-
-# ── Linux credential saving ─────────────────────────────────────────────────
-
-
-class TestSaveCredentialsLinux:
-    def test_writes_file(self, tmp_path):
-        cred_file = tmp_path / ".claude" / ".credentials.json"
-        cred_file.parent.mkdir(parents=True)
-        cred_file.write_text("{}")
-        with patch("src.auth.Path.home", return_value=tmp_path):
-            _save_credentials_linux('{"updated": true}')
-        assert json.loads(cred_file.read_text()) == {"updated": True}
-
-
-# ── _get_keychain_account() ──────────────────────────────────────────────────
-
-
-class TestGetKeychainAccount:
-    @patch("src.auth.subprocess.run")
-    def test_extracts_account(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout='keychain: "/Users/test/Library/Keychains/login.keychain-db"\n'
-                   'class: "genp"\n'
-                   'attributes:\n'
-                   '    "acct"<blob>="myuser"\n'
-                   '    "svce"<blob>="Claude Code-credentials"\n',
-        )
-        assert _get_keychain_account() == "myuser"
-
-    @patch("src.auth.subprocess.run")
-    def test_not_found(self, mock_run):
-        mock_run.return_value = MagicMock(returncode=44, stdout="")
-        assert _get_keychain_account() == ""
-
-    @patch("src.auth.subprocess.run")
-    def test_timeout(self, mock_run):
-        mock_run.side_effect = subprocess.TimeoutExpired(cmd="security", timeout=5)
-        assert _get_keychain_account() == ""
