@@ -1,7 +1,6 @@
 import json
 import subprocess
 import sys
-import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -17,9 +16,9 @@ class AuthResult:
 def get_oauth_token() -> AuthResult:
     """Retrieve the Claude Code OAuth token from the system credential store.
 
-    If the token is expired, returns an error directing the user to open
-    Claude Code to refresh it. We never refresh the token ourselves to
-    avoid invalidating the refresh token and logging out active sessions.
+    Returns whatever token is in the keychain without checking expiry.
+    If the token is stale, the API will reject it and the backoff logic
+    will retry until Claude Code refreshes the keychain.
     """
     raw = _read_raw_credentials()
     if raw is None:
@@ -48,16 +47,6 @@ def get_oauth_token() -> AuthResult:
             error="Credentials found but no access_token present.",
         )
 
-    # Check if token is expired
-    expires_at_ms = oauth_data.get("expiresAt")
-    if expires_at_ms:
-        now_ms = time.time() * 1000
-        if now_ms >= expires_at_ms:
-            return AuthResult(
-                access_token=None,
-                error="Token expired.\nOpen Claude Code to refresh.",
-            )
-
     return AuthResult(access_token=token, error=None)
 
 
@@ -70,7 +59,22 @@ def _read_raw_credentials() -> str | None:
 
 
 def _read_keychain_macos() -> str | None:
+    import os
+
+    user = os.environ.get("USER", "")
     try:
+        # Try with account name first — Claude Code writes with -a $USER
+        if user:
+            result = subprocess.run(
+                ["security", "find-generic-password", "-s", KEYCHAIN_SERVICE_NAME, "-a", user, "-w"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+
+        # Fall back to no account filter
         result = subprocess.run(
             ["security", "find-generic-password", "-s", KEYCHAIN_SERVICE_NAME, "-w"],
             capture_output=True,

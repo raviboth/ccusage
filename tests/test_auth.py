@@ -1,7 +1,6 @@
-"""Tests for src/auth.py — token retrieval and expiry checking."""
+"""Tests for src/auth.py — token retrieval."""
 
 import json
-import time
 from unittest.mock import patch
 
 import pytest
@@ -9,32 +8,15 @@ import pytest
 from src.auth import AuthResult, get_oauth_token
 
 
-def _make_credentials(
-    token="sk-test-token",
-    expires_at_ms=None,
-    scopes=None,
-):
+def _make_credentials(token="sk-test-token"):
     """Build a credential JSON string matching the keychain format."""
-    oauth = {"accessToken": token}
-    if expires_at_ms is not None:
-        oauth["expiresAt"] = expires_at_ms
-    if scopes:
-        oauth["scopes"] = scopes
-    return json.dumps({"claudeAiOauth": oauth})
-
-
-def _future_ms(seconds=3600):
-    return int((time.time() + seconds) * 1000)
-
-
-def _past_ms(seconds=3600):
-    return int((time.time() - seconds) * 1000)
+    return json.dumps({"claudeAiOauth": {"accessToken": token}})
 
 
 # ── Basic credential reading ────────────────────────────────────────────────
 
 
-class TestGetOAuthTokenBasic:
+class TestGetOAuthToken:
     @patch("src.auth._read_raw_credentials")
     def test_no_credentials(self, mock_read):
         mock_read.return_value = None
@@ -70,33 +52,13 @@ class TestGetOAuthTokenBasic:
         assert result.access_token == "sk-flat"
         assert result.error is None
 
-
-# ── Token expiry ─────────────────────────────────────────────────────────────
-
-
-class TestTokenExpiry:
     @patch("src.auth._read_raw_credentials")
-    def test_non_expired_returns_token(self, mock_read):
-        mock_read.return_value = _make_credentials(
-            token="sk-valid", expires_at_ms=_future_ms(3600)
-        )
+    def test_returns_token_regardless_of_expiry(self, mock_read):
+        """Token is returned even if expiresAt is in the past — API handles rejection."""
+        import time
+        past_ms = int((time.time() - 3600) * 1000)
+        creds = json.dumps({"claudeAiOauth": {"accessToken": "sk-stale", "expiresAt": past_ms}})
+        mock_read.return_value = creds
         result = get_oauth_token()
-        assert result.access_token == "sk-valid"
-        assert result.error is None
-
-    @patch("src.auth._read_raw_credentials")
-    def test_expired_returns_error(self, mock_read):
-        mock_read.return_value = _make_credentials(
-            token="sk-expired", expires_at_ms=_past_ms(60)
-        )
-        result = get_oauth_token()
-        assert result.access_token is None
-        assert "expired" in result.error.lower()
-        assert "Claude Code" in result.error
-
-    @patch("src.auth._read_raw_credentials")
-    def test_no_expires_at_returns_token(self, mock_read):
-        mock_read.return_value = _make_credentials(token="sk-no-expiry")
-        result = get_oauth_token()
-        assert result.access_token == "sk-no-expiry"
+        assert result.access_token == "sk-stale"
         assert result.error is None
