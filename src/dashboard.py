@@ -320,7 +320,12 @@ class DashboardWindow(QWidget):
     def get_insights_placeholder(self) -> QWidget:
         return self._insights_placeholder
 
+    def set_hide_callback(self, callback: Callable[[], None]) -> None:
+        self._hide_callback = callback
+
     def closeEvent(self, event) -> None:
         """Hide instead of close — the tray keeps running."""
         event.ignore()
         self.hide()
+        if hasattr(self, "_hide_callback"):
+            self._hide_callback()

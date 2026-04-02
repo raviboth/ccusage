@@ -49,7 +49,7 @@ class App:
         # On macOS, allow the app to show windows from background
         if sys.platform == "darwin":
             import AppKit
-            AppKit.NSApplication.sharedApplication().setActivationPolicy_(0)  # Regular
+            AppKit.NSApplication.sharedApplication().setActivationPolicy_(2)  # Accessory — no dock icon
 
         self._signals = Signals()
         self._db = UsageDB()
@@ -61,6 +61,7 @@ class App:
 
         # Dashboard
         self._dashboard = DashboardWindow()
+        self._dashboard.set_hide_callback(self._on_dashboard_hidden)
         self._dashboard.set_refresh_callback(self._on_refresh)
         self._dashboard.set_threshold_callback(self._on_threshold_changed)
         self._dashboard.set_threshold_enabled_callback(self._on_threshold_enabled_changed)
@@ -162,9 +163,20 @@ class App:
         if stats:
             self._chart.set_data(stats.daily_activity)
             self._insights.set_stats(stats)
+        # Become a regular app so macOS lets us take focus
+        if sys.platform == "darwin":
+            import AppKit
+            ns_app = AppKit.NSApplication.sharedApplication()
+            ns_app.setActivationPolicy_(0)  # Regular
+            ns_app.activateIgnoringOtherApps_(True)
         self._dashboard.show()
         self._dashboard.raise_()
         self._dashboard.activateWindow()
+
+    def _on_dashboard_hidden(self) -> None:
+        if sys.platform == "darwin":
+            import AppKit
+            AppKit.NSApplication.sharedApplication().setActivationPolicy_(2)  # Accessory
 
     def _on_refresh(self, *_args) -> None:
         self._dashboard.set_refresh_enabled(False)

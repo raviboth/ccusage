@@ -86,9 +86,9 @@ def fetch_usage(access_token: str) -> UsageResult:
     if extra and extra.get("is_enabled"):
         extra_usage = ExtraUsage(
             is_enabled=True,
-            monthly_limit=extra.get("monthly_limit", 0) / 100.0,  # cents to dollars
-            used_credits=extra.get("used_credits", 0) / 100.0,  # cents to dollars
-            utilization=extra.get("utilization", 0) / 100.0,
+            monthly_limit=(extra.get("monthly_limit") or 0) / 100.0,  # cents to dollars
+            used_credits=(extra.get("used_credits") or 0) / 100.0,  # cents to dollars
+            utilization=(extra.get("utilization") or 0) / 100.0,
         )
 
     return UsageResult(
@@ -110,7 +110,7 @@ def _parse_window(data: dict | None) -> UsageWindow:
         return UsageWindow(utilization=0.0, resets_at=None)
 
     # API returns utilization as percentage (0-100+), normalize to 0.0-1.0+
-    util = data.get("utilization", 0.0) / 100.0
+    util = (data.get("utilization") or 0.0) / 100.0
     resets_at_str = data.get("resets_at")
     resets_at = None
     if resets_at_str:

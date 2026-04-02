@@ -58,6 +58,11 @@ class TestParseWindow:
         assert w.utilization == pytest.approx(0.75)
         assert w.resets_at is None
 
+    def test_null_utilization(self):
+        w = _parse_window({"utilization": None, "resets_at": "2026-03-19T12:00:00+00:00"})
+        assert w.utilization == pytest.approx(0.0)
+        assert w.resets_at == datetime(2026, 3, 19, 12, 0, tzinfo=timezone.utc)
+
 
 # ── fetch_usage() ────────────────────────────────────────────────────────────
 
@@ -118,6 +123,24 @@ class TestFetchUsageSuccess:
         assert result.data.extra_usage.monthly_limit == pytest.approx(50.0)
         assert result.data.extra_usage.used_credits == pytest.approx(12.34)
         assert result.data.extra_usage.utilization == pytest.approx(0.25)
+
+    @patch("src.api.requests.get")
+    def test_extra_usage_with_null_fields(self, mock_get):
+        body = {
+            **_FULL_BODY,
+            "extra_usage": {
+                "is_enabled": True,
+                "monthly_limit": None,
+                "used_credits": None,
+                "utilization": None,
+            },
+        }
+        mock_get.return_value = _make_response(200, body)
+        result = fetch_usage("test-token")
+        assert result.data.extra_usage is not None
+        assert result.data.extra_usage.utilization == pytest.approx(0.0)
+        assert result.data.extra_usage.monthly_limit == pytest.approx(0.0)
+        assert result.data.extra_usage.used_credits == pytest.approx(0.0)
 
     @patch("src.api.requests.get")
     def test_extra_usage_disabled(self, mock_get):
